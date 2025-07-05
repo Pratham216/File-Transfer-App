@@ -1,0 +1,77 @@
+.App {
+  text-align: center;
+  margin-top: 0;
+  background-color: rgba(0, 0, 0, 0.414);
+}
+
+html{
+  scroll-behavior: smooth;
+}
+
+
+
+.upload-container {
+  border: 1px solid #ccc;
+  padding: 20px;
+  max-width: 400px;
+  margin: 0 auto;
+  border-radius: 5px;
+  background-color: black;
+}
+
+.upload-button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+.download-section {
+  margin-top: 20px;
+}
+
+a {
+  color: #007bff;
+  text-decoration: none;
+
+}
+
+.upload-container {
+  padding: 80px;
+}
+
+.progress-bar-container {
+  margin-top: 20px;
+}
+
+progress {
+  width: 100%;
+  height: 20px;
+}
+
+span {
+  font-size: 16px;
+  margin-left: 10px;
+}
+
+input[type="file"] {
+  display: none; /* Hide the default file input */
+}
+
+.file-list {
+  margin-top: 20px;
+}
+
+.file-list ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.file-list li {
+  padding: 5px 0;
+  border-bottom: 1px solid #ddd;
+}
+

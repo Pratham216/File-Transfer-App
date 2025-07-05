@@ -1,0 +1,53 @@
+.styled-wrapper button {
+    display: inline-block;
+    width: 120px;
+    height: 40px;
+    border-radius: 10px;
+    border: 1px solid #03045e;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.5s ease-in;
+    z-index: 1;
+    background-color: rgb(4, 156, 190);
+  }
+  
+  .styled-wrapper button::before,
+  .styled-wrapper button::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 0;
+    height: 100%;
+    transform: skew(15deg);
+    transition: all 0.5s;
+    overflow: hidden;
+    z-index: -1;
+  }
+  
+  .styled-wrapper button::before {
+    left: -10px;
+    background: #240046;
+  }
+  
+  .styled-wrapper button::after {
+    right: -10px;
+    background: #5a189a;
+  }
+  
+  .styled-wrapper button:hover::before,
+  .styled-wrapper button:hover::after {
+    width: 59%;
+  }
+  
+  .styled-wrapper button:hover  {
+    color: #e0aaff;
+    transition: 0.3s;
+  }
+  
+  .styled-wrapper button  {
+    color: #03045e;
+    font-size: 16px;  
+    transition: all 0.3s ease-in;
+  }
+
+  
