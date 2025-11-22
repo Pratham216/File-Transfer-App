@@ -1,77 +1,91 @@
-.App {
-  text-align: center;
-  margin-top: 0;
-  background-color: rgba(0, 0, 0, 0.414);
-}
-
-html{
-  scroll-behavior: smooth;
-}
-
-
-
-.upload-container {
-  border: 1px solid #ccc;
-  padding: 20px;
-  max-width: 400px;
-  margin: 0 auto;
-  border-radius: 5px;
-  background-color: black;
-}
-
-.upload-button {
-  margin-top: 10px;
-  padding: 10px 20px;
-  cursor: pointer;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-}
-
-.download-section {
-  margin-top: 20px;
-}
-
-a {
-  color: #007bff;
-  text-decoration: none;
-
-}
-
-.upload-container {
-  padding: 80px;
-}
-
-.progress-bar-container {
-  margin-top: 20px;
-}
-
-progress {
-  width: 100%;
-  height: 20px;
-}
-
-span {
-  font-size: 16px;
-  margin-left: 10px;
-}
-
-input[type="file"] {
-  display: none; /* Hide the default file input */
-}
-
-.file-list {
-  margin-top: 20px;
-}
-
-.file-list ul {
-  list-style-type: none;
+* {
+  box-sizing: border-box;
+  margin: 0;
   padding: 0;
 }
 
-.file-list li {
-  padding: 5px 0;
-  border-bottom: 1px solid #ddd;
+html {
+  scroll-behavior: smooth;
+  background: #0a0618;
 }
 
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #0a0618;
+  color: #ffffff;
+}
+
+#root {
+  min-height: 100vh;
+  background: #0a0618;
+}
+
+/* Hide default file input */
+input[type="file"] {
+  display: none;
+}
+
+/* Selection styling */
+::selection {
+  background: rgba(139, 92, 246, 0.4);
+  color: white;
+  text-shadow: 0 0 10px rgba(139, 92, 246, 0.8);
+}
+
+::-moz-selection {
+  background: rgba(139, 92, 246, 0.4);
+  color: white;
+}
+
+/* Focus styles */
+*:focus {
+  outline: none;
+}
+
+*:focus-visible {
+  outline: 2px solid #8b5cf6;
+  outline-offset: 3px;
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+}
+
+/* Button reset */
+button {
+  font-family: inherit;
+  border: none;
+  background: none;
+}
+
+/* Link styles */
+a {
+  color: #c4b5fd;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+a:hover {
+  color: #e0c3fc;
+  text-shadow: 0 0 10px rgba(224, 195, 252, 0.5);
+}
+
+/* Scrollbar styling for dark theme */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(16, 10, 35, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #8b5cf6 0%, #22d3ee 50%, #10b981 100%);
+  border-radius: 6px;
+  border: 2px solid rgba(16, 10, 35, 0.5);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #9d6fff 0%, #38d9e9 50%, #34d399 100%);
+}
