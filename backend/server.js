@@ -21,16 +21,17 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage, limits: { fileSize: 50 * 1024 * 1024 } });
 
-// Get the Ngrok URL from environment variables
-const ngrokUrl = process.env.REACT_APP_NGROK_URL; // Default fallback
-console.log("Ngrok URL: ", ngrokUrl);
+// Get the Ngrok URL from environment variables or use IPv4 address
+const ngrokUrl = process.env.REACT_APP_NGROK_URL || 'http://10.213.69.178:5000';
+const BASE_URL = ngrokUrl;
+console.log("Base URL: ", BASE_URL);
 
 
 // Upload route
 app.post("/upload", upload.array("files", 10), (req, res) => {
   if (req.files.length === 1) {
     // Single file, return directly
-    const fileUrl = `${ngrokUrl}/uploads/${req.files[0].filename}`; // Updated download URL with ngrokUrl
+    const fileUrl = `${BASE_URL}/uploads/${req.files[0].filename}`; // Updated download URL with BASE_URL
     return res.json({ downloadUrl: fileUrl });
   }
 
@@ -42,7 +43,7 @@ app.post("/upload", upload.array("files", 10), (req, res) => {
 
   output.on("close", () => {
     console.log(`ZIP file created: ${zipPath}`);
-    const zipUrl = `${ngrokUrl}/${zipFileName}`; // Updated ZIP file URL with ngrokUrl
+    const zipUrl = `${BASE_URL}/${zipFileName}`; // Updated ZIP file URL with BASE_URL
     res.json({ downloadUrl: zipUrl });
   });
 
@@ -59,6 +60,8 @@ app.post("/upload", upload.array("files", 10), (req, res) => {
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 const PORT = 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on ${ngrokUrl}`);
+const HOST = '10.213.69.178'; // Your IPv4 address
+app.listen(PORT, HOST, () => {
+  console.log(`Server running on http://${HOST}:${PORT}`);
+  console.log(`Base URL: ${BASE_URL}`);
 });

@@ -13,7 +13,8 @@ const FileUpload = () => {
     setFiles(acceptedFiles);
   };
 
-  const ngrokUrl = import.meta.env.VITE_NGROK_URL;
+  // Use IPv4 address or fallback to environment variable
+  const ngrokUrl = import.meta.env.VITE_NGROK_URL || 'http://10.213.69.178:5000';
 
   const handleUpload = () => {
     if (files.length === 0) return alert("Please select files!");
