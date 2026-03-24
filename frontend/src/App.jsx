@@ -1,5 +1,6 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ToastProvider } from "./components/Toast/ToastContext";
 import Navbar from "./components/Navbar/Navbar";
 import Hero from "./components/Hero/Hero";
 import Stats from "./components/Stats/Stats";
@@ -10,7 +11,8 @@ import "./App.css";
 
 function App() {
   return (
-    <AnimatePresence>
+    <ToastProvider>
+      <AnimatePresence>
       <motion.div 
         className="App"
         initial={{ opacity: 0 }}
@@ -95,6 +97,7 @@ function App() {
         <Footer />
       </motion.div>
     </AnimatePresence>
+    </ToastProvider>
   );
 }
 

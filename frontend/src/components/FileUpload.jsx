@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { QRCodeCanvas } from "qrcode.react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useToast } from "./Toast/ToastContext";
 import "../App.css";
 
 const FileUpload = () => {
@@ -10,6 +11,7 @@ const FileUpload = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const toast = useToast();
 
   const handleFileChange = (acceptedFiles) => {
     setFiles(acceptedFiles);
@@ -19,7 +21,10 @@ const FileUpload = () => {
   const ngrokUrl = import.meta.env.VITE_NGROK_URL || 'http://10.213.69.178:5000';
 
   const handleUpload = () => {
-    if (files.length === 0) return alert("Please select files!");
+    if (files.length === 0) {
+      toast.warning("Please select files!");
+      return;
+    }
 
     setIsLoading(true);
     const formData = new FormData();
@@ -42,14 +47,29 @@ const FileUpload = () => {
         setUploadProgress(100);
         setIsLoading(false);
       } else {
+        let errorMessage = "Upload failed. Please try again.";
+        try {
+          const errorData = JSON.parse(xhr.responseText);
+          errorMessage = errorData.message || errorData.error || errorMessage;
+        } catch (e) {
+          if (xhr.status === 413) {
+            errorMessage = "File is too large. Maximum file size is 500MB.";
+          } else if (xhr.status === 400) {
+            errorMessage = "Invalid file or too many files. Maximum 10 files allowed.";
+          }
+        }
+        toast.error(errorMessage);
         console.error("Upload failed", xhr.responseText);
         setIsLoading(false);
+        setUploadProgress(0);
       }
     };
 
     xhr.onerror = () => {
+      toast.error("Network error. Please check your connection and try again.");
       console.error("Error uploading files");
       setIsLoading(false);
+      setUploadProgress(0);
     };
 
     xhr.send(formData);
@@ -69,6 +89,15 @@ const FileUpload = () => {
     onDragLeave: () => setIsDragging(false),
     onDropAccepted: () => setIsDragging(false),
     multiple: true,
+    maxSize: 500 * 1024 * 1024, // 500MB
+    onDropRejected: (fileRejections) => {
+      const rejection = fileRejections[0];
+      if (rejection.errors[0]?.code === 'file-too-large') {
+        toast.error(`File "${rejection.file.name}" is too large. Maximum file size is 500MB.`);
+      } else {
+        toast.warning(`File "${rejection.file.name}" was rejected: ${rejection.errors[0]?.message}`);
+      }
+    },
   });
 
   const handleReset = () => {
@@ -133,7 +162,7 @@ const FileUpload = () => {
                 : "Drag & drop files here or click to browse"}
           </p>
           {!files.length && (
-            <p className="dropzone-hint">Supports multiple files (max 50MB each)</p>
+            <p className="dropzone-hint">Supports multiple files (max 500MB each)</p>
           )}
         </div>
       </motion.div>
@@ -265,7 +294,7 @@ const FileUpload = () => {
                 className="copy-button"
                 onClick={() => {
                   navigator.clipboard.writeText(downloadUrl);
-                  alert('Link copied to clipboard!');
+                  toast.success('Link copied to clipboard!');
                 }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
