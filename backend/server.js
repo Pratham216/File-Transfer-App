@@ -20,6 +20,12 @@ const supabase = createClient(
   process.env.SUPABASE_KEY
 );
 
+// Ensure upload directory exists
+const uploadsDir = path.join(__dirname, "uploads");
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
 // Set up storage for multer
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
