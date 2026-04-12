@@ -4,6 +4,7 @@ const path = require("path");
 const fs = require("fs");
 const archiver = require("archiver");
 const cors = require("cors");
+const os = require("os");
 require("dotenv").config();
 
 const app = express();
@@ -21,9 +22,26 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage, limits: { fileSize: 50 * 1024 * 1024 } });
 
-// Get the Ngrok URL from environment variables or use IPv4 address
-const ngrokUrl = process.env.REACT_APP_NGROK_URL || 'http://10.213.69.178:5000';
-const BASE_URL = ngrokUrl;
+// Set local IP dynamically
+const networkInterfaces = os.networkInterfaces();
+let localIp = "localhost";
+for (const interfaceName in networkInterfaces) {
+  const interfaces = networkInterfaces[interfaceName];
+  for (const iface of interfaces) {
+    if (iface.family === "IPv4" && !iface.internal) {
+      localIp = iface.address;
+      break;
+    }
+  }
+}
+
+const PORT = process.env.PORT || 5000;
+// Only use REACT_APP_NGROK_URL if it's an actual ngrok URL, otherwise use detected local IP
+const envNgrok = process.env.REACT_APP_NGROK_URL;
+const BASE_URL = (envNgrok && envNgrok.includes("ngrok")) 
+  ? envNgrok 
+  : `http://${localIp}:${PORT}`;
+console.log("Detected Local IP: ", localIp);
 console.log("Base URL: ", BASE_URL);
 
 
@@ -59,9 +77,9 @@ app.post("/upload", upload.array("files", 10), (req, res) => {
 // Serve uploaded files or zip
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-const PORT = 5000;
-const HOST = '10.213.69.178'; // Your IPv4 address
+const HOST = '0.0.0.0'; // Listen on all network interfaces
 app.listen(PORT, HOST, () => {
-  console.log(`Server running on http://${HOST}:${PORT}`);
-  console.log(`Base URL: ${BASE_URL}`);
+  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Externally accessible at http://${localIp}:${PORT}`);
+  console.log(`Base URL being used: ${BASE_URL}`);
 });

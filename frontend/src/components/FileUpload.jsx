@@ -15,8 +15,9 @@ const FileUpload = () => {
     setFiles(acceptedFiles);
   };
 
-  // Use IPv4 address or fallback to environment variable
-  const ngrokUrl = import.meta.env.VITE_NGROK_URL || 'http://10.213.69.178:5000';
+  // Use current hostname to find backend or fallback to environment variable
+  const backendHost = import.meta.env.VITE_NGROK_URL || `http://${window.location.hostname}:5000`;
+  const ngrokUrl = backendHost;
 
   const handleUpload = () => {
     if (files.length === 0) return alert("Please select files!");
