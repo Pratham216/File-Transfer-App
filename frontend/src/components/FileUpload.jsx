@@ -145,7 +145,7 @@ const FileUpload = () => {
                 : "Drag & drop files here or click to browse"}
           </p>
           {!files.length && (
-            <p className="dropzone-hint">Supports multiple files (max 2GB each)</p>
+            <p className="dropzone-hint">Supports multiple files (max 200MB each)</p>
           )}
         </div>
       </motion.div>
