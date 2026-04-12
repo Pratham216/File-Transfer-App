@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { createPortal } from "react-dom";
 import { useDropzone } from "react-dropzone";
 import { QRCodeCanvas } from "qrcode.react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -10,6 +11,8 @@ const FileUpload = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
 
   const handleFileChange = (acceptedFiles) => {
     setFiles(acceptedFiles);
@@ -79,6 +82,14 @@ const FileUpload = () => {
     setIsLoading(false);
   };
 
+  const triggerToast = (message) => {
+    setToastMessage(message);
+    setShowToast(true);
+    setTimeout(() => {
+      setShowToast(false);
+    }, 3000);
+  };
+
   return (
     <motion.div 
       className="upload-container"
@@ -134,7 +145,7 @@ const FileUpload = () => {
                 : "Drag & drop files here or click to browse"}
           </p>
           {!files.length && (
-            <p className="dropzone-hint">Supports multiple files (max 50MB each)</p>
+            <p className="dropzone-hint">Supports multiple files (max 2GB each)</p>
           )}
         </div>
       </motion.div>
@@ -266,7 +277,7 @@ const FileUpload = () => {
                 className="copy-button"
                 onClick={() => {
                   navigator.clipboard.writeText(downloadUrl);
-                  alert('Link copied to clipboard!');
+                  triggerToast('Link copied to clipboard!');
                 }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -321,6 +332,28 @@ const FileUpload = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {createPortal(
+        <AnimatePresence>
+          {showToast && (
+            <motion.div 
+              className="toast-notification"
+              initial={{ opacity: 0, y: -50, x: '-50%', scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, x: '-50%', scale: 1 }}
+              exit={{ opacity: 0, y: -50, x: '-50%', scale: 0.9 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            >
+              <div className="toast-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <span className="toast-message">{toastMessage}</span>
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </motion.div>
   );
 };

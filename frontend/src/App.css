@@ -754,3 +754,47 @@ html {
   background: linear-gradient(180deg, #9d6fff 0%, #38d9e9 50%, #34d399 100%);
   box-shadow: 0 0 15px rgba(139, 92, 246, 0.7);
 }
+
+/* Toast Notification Styles */
+.toast-notification {
+  position: fixed;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10000;
+  background: rgba(16, 10, 35, 0.85);
+  backdrop-filter: blur(15px);
+  padding: 12px 28px;
+  border-radius: 50px;
+  border: 1px solid rgba(139, 92, 246, 0.5);
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 
+    0 15px 40px rgba(0, 0, 0, 0.6),
+    0 0 25px rgba(139, 92, 246, 0.4),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.toast-icon {
+  width: 20px;
+  height: 20px;
+  color: #10b981;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 0 5px rgba(16, 185, 129, 0.8));
+}
+
+.toast-message {
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  background: linear-gradient(135deg, #fff, #a5f3fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}

@@ -20,7 +20,7 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage, limits: { fileSize: 50 * 1024 * 1024 } });
+const upload = multer({ storage, limits: { fileSize: 2 * 1024 * 1024 * 1024 } });
 
 // Set local IP dynamically
 const networkInterfaces = os.networkInterfaces();
@@ -78,8 +78,10 @@ app.post("/upload", upload.array("files", 10), (req, res) => {
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 const HOST = '0.0.0.0'; // Listen on all network interfaces
-app.listen(PORT, HOST, () => {
+const server = app.listen(PORT, HOST, () => {
   console.log(`Server running on http://localhost:${PORT}`);
   console.log(`Externally accessible at http://${localIp}:${PORT}`);
   console.log(`Base URL being used: ${BASE_URL}`);
 });
+
+server.timeout = 1800000; // 30 minutes
