@@ -20,16 +20,16 @@ const supabase = createClient(
   process.env.SUPABASE_KEY
 );
 
-// Ensure upload directory exists
+// Ensure upload directory exists (Critical for Render/Cloud)
 const uploadsDir = path.join(__dirname, "uploads");
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-// Set up storage for multer
+// Set up storage for multer using absolute path
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/");
+    cb(null, uploadsDir);
   },
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}-${file.originalname}`);
@@ -125,7 +125,7 @@ app.post("/upload", upload.array("files", 10), async (req, res) => {
     archive.finalize();
   } catch (err) {
     console.error("Upload error:", err);
-    res.status(500).json({ error: "Upload failed" });
+    res.status(500).json({ error: "Upload failed", details: err.message });
   }
 });
 
