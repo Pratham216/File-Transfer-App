@@ -1,4 +1,3 @@
-const { createClient } = require("@supabase/supabase-js");
 const express = require("express");
 const multer = require("multer");
 const path = require("path");
@@ -13,12 +12,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Initialize Supabase
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY
-);
 
 // Ensure upload directory exists (Critical for Render/Cloud)
 const uploadsDir = path.join(__dirname, "uploads");
@@ -37,6 +30,7 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage, limits: { fileSize: 2 * 1024 * 1024 * 1024 } });
+const FILE_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
 
 // Set local IP dynamically
 const networkInterfaces = os.networkInterfaces();
@@ -52,32 +46,62 @@ for (const interfaceName in networkInterfaces) {
 }
 
 const PORT = process.env.PORT || 5000;
-// Only use REACT_APP_NGROK_URL if it's an actual ngrok URL, otherwise use detected local IP
-const envNgrok = process.env.REACT_APP_NGROK_URL;
-const BASE_URL = (envNgrok && envNgrok.includes("ngrok")) 
-  ? envNgrok 
-  : `http://${localIp}:${PORT}`;
+const BASE_URL = `http://${localIp}:${PORT}`;
 console.log("Detected Local IP: ", localIp);
 console.log("Base URL: ", BASE_URL);
 
+const fileExists = async (filePath) => {
+  try {
+    await fsPromises.access(filePath, fs.constants.F_OK);
+    return true;
+  } catch {
+    return false;
+  }
+};
 
-// Helper to upload to Supabase
-const uploadToSupabase = async (filePath, fileName, mimetype) => {
-  const fileBuffer = fs.readFileSync(filePath);
-  const { data, error } = await supabase.storage
-    .from("files")
-    .upload(fileName, fileBuffer, {
-      contentType: mimetype,
-      upsert: true,
-    });
+const scheduleFileDeletion = (filePath, delayMs = FILE_EXPIRY_MS) => {
+  setTimeout(async () => {
+    try {
+      if (await fileExists(filePath)) {
+        await fsPromises.unlink(filePath);
+        console.log(`Deleted expired file: ${filePath}`);
+      }
+    } catch (error) {
+      console.error(`Failed deleting expired file ${filePath}:`, error.message);
+    }
+  }, delayMs);
+};
 
-  if (error) throw error;
+const deleteExpiredFiles = async () => {
+  try {
+    const files = await fsPromises.readdir(uploadsDir);
+    const now = Date.now();
 
-  const { data: { publicUrl } } = supabase.storage
-    .from("files")
-    .getPublicUrl(fileName);
+    await Promise.all(
+      files.map(async (name) => {
+        const filePath = path.join(uploadsDir, name);
+        const stats = await fsPromises.stat(filePath);
 
-  return publicUrl;
+        if (stats.isFile() && now - stats.mtimeMs >= FILE_EXPIRY_MS) {
+          await fsPromises.unlink(filePath);
+          console.log(`Deleted stale file: ${filePath}`);
+        }
+      })
+    );
+  } catch (error) {
+    console.error("Error during expired file cleanup:", error.message);
+  }
+};
+
+const getBaseUrl = (req) => {
+  const forwardedProto = req.headers["x-forwarded-proto"];
+  const forwardedHost = req.headers["x-forwarded-host"];
+
+  if (forwardedProto && forwardedHost) {
+    return `${forwardedProto}://${forwardedHost}`;
+  }
+
+  return BASE_URL;
 };
 
 // Upload route
@@ -89,12 +113,9 @@ app.post("/upload", upload.array("files", 10), async (req, res) => {
 
     if (req.files.length === 1) {
       const file = req.files[0];
-      const publicUrl = await uploadToSupabase(file.path, file.filename, file.mimetype);
-      
-      // Clean up local file
-      fs.unlinkSync(file.path);
-      
-      return res.json({ downloadUrl: publicUrl });
+      const baseUrl = getBaseUrl(req);
+      scheduleFileDeletion(file.path);
+      return res.json({ downloadUrl: `${baseUrl}/uploads/${file.filename}` });
     }
 
     // Multiple files, create a ZIP
@@ -105,13 +126,12 @@ app.post("/upload", upload.array("files", 10), async (req, res) => {
 
     output.on("close", async () => {
       try {
-        const publicUrl = await uploadToSupabase(zipPath, zipName, "application/zip");
-        
-        // Clean up all local files (original and zip)
-        req.files.forEach(f => fs.unlinkSync(f.path));
-        fs.unlinkSync(zipPath);
-        
-        res.json({ downloadUrl: publicUrl });
+        // Clean up all original files; keep zip available for download.
+        await Promise.all(req.files.map((f) => fsPromises.unlink(f.path)));
+        scheduleFileDeletion(zipPath);
+
+        const baseUrl = getBaseUrl(req);
+        res.json({ downloadUrl: `${baseUrl}/uploads/${zipName}` });
       } catch (err) {
         console.error("ZIP upload error:", err);
         res.status(500).json({ error: "Failed to upload ZIP" });
@@ -131,9 +151,12 @@ app.post("/upload", upload.array("files", 10), async (req, res) => {
 
 // Serve uploaded files or zip
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.get("/health", (req, res) => res.json({ status: "ok" }));
 
 const HOST = '0.0.0.0'; // Listen on all network interfaces
 const server = app.listen(PORT, HOST, () => {
+  deleteExpiredFiles();
+  setInterval(deleteExpiredFiles, 5 * 60 * 1000);
   console.log(`Server running on http://localhost:${PORT}`);
   console.log(`Externally accessible at http://${localIp}:${PORT}`);
   console.log(`Base URL being used: ${BASE_URL}`);

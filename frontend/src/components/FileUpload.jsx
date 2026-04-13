@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { createPortal } from "react-dom";
 import { useDropzone } from "react-dropzone";
 import { QRCodeCanvas } from "qrcode.react";
@@ -18,9 +18,9 @@ const FileUpload = () => {
     setFiles(acceptedFiles);
   };
 
-  // Use current hostname to find backend or fallback to environment variable
-  const backendHost = import.meta.env.VITE_NGROK_URL || `http://${window.location.hostname}:5000`;
-  const ngrokUrl = backendHost;
+  const apiBaseUrl =
+    (import.meta.env.PROD && import.meta.env.VITE_API_BASE_URL) ||
+    `http://${window.location.hostname}:5000`;
 
   const handleUpload = () => {
     if (files.length === 0) return alert("Please select files!");
@@ -30,7 +30,7 @@ const FileUpload = () => {
     Array.from(files).forEach((file) => formData.append("files", file));
 
     const xhr = new XMLHttpRequest();
-    xhr.open("POST", `${ngrokUrl}/upload`, true);
+    xhr.open("POST", `${apiBaseUrl}/upload`, true);
 
     xhr.upload.onprogress = (event) => {
       if (event.lengthComputable) {
