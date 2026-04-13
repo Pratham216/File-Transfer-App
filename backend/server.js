@@ -9,6 +9,7 @@ const os = require("os");
 require("dotenv").config();
 
 const app = express();
+app.set("trust proxy", true);
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -47,6 +48,7 @@ for (const interfaceName in networkInterfaces) {
 
 const PORT = process.env.PORT || 5000;
 const BASE_URL = `http://${localIp}:${PORT}`;
+const PUBLIC_BASE_URL = process.env.PUBLIC_BASE_URL;
 console.log("Detected Local IP: ", localIp);
 console.log("Base URL: ", BASE_URL);
 
@@ -94,6 +96,10 @@ const deleteExpiredFiles = async () => {
 };
 
 const getBaseUrl = (req) => {
+  if (PUBLIC_BASE_URL) {
+    return PUBLIC_BASE_URL.replace(/\/+$/, "");
+  }
+
   const forwardedProto = req.headers["x-forwarded-proto"];
   const forwardedHost = req.headers["x-forwarded-host"];
 
@@ -160,6 +166,9 @@ const server = app.listen(PORT, HOST, () => {
   console.log(`Server running on http://localhost:${PORT}`);
   console.log(`Externally accessible at http://${localIp}:${PORT}`);
   console.log(`Base URL being used: ${BASE_URL}`);
+  if (PUBLIC_BASE_URL) {
+    console.log(`Public base URL override: ${PUBLIC_BASE_URL}`);
+  }
 });
 
 server.timeout = 1800000; // 30 minutes
