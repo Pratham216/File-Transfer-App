@@ -29,7 +29,7 @@
 ## 📥 Download
 
 ### Windows Installer
-- [Download TransferHub Setup v1.0.0](https://github.com/Pratham216/File-Transfer-App/releases/download/v1.0.0/TransferHub%20Setup%201.0.0.exe)
+- [Download TransferHub Setup v1.0.0](https://github.com/Pratham216/File-Transfer-App/releases/download/v1.0.0/TransferHub.Setup.1.0.0.exe)
 
 ### All Releases
 - [View all versions on GitHub Releases](https://github.com/Pratham216/File-Transfer-App/releases)
