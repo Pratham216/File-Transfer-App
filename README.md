@@ -11,10 +11,11 @@
 [![Node.js](https://img.shields.io/badge/Node.js-18+-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
 [![Vite](https://img.shields.io/badge/Vite-6.0.5-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Framer Motion](https://img.shields.io/badge/Framer%20Motion-12.10.5-0055FF?style=for-the-badge&logo=framer&logoColor=white)](https://www.framer.com/motion/)
+[![Version](https://img.shields.io/badge/Version-v1.0.0-7c3aed?style=for-the-badge)](https://github.com/Pratham216/File-Transfer-App/releases/tag/v1.0.0)
 
 **Lightning-fast, secure file sharing powered by cutting-edge technology**
 
-[Features](#-features) • [Tech Stack](#-tech-stack) • [Installation](#-installation) • [Usage](#-usage) • [Screenshots](#-screenshots)
+[Live Demo](#-live-demo) • [Download](#-download) • [Features](#-features) • [Tech Stack](#-tech-stack) • [Installation](#-installation) • [Usage](#-usage) 
 
 ---
 
@@ -23,6 +24,15 @@
 ## 🚀 Live Demo
 
 🔗 [Click here to try the app](https://file-transfer-app-axlw.vercel.app/)
+
+---
+## 📥 Download
+
+### Windows Installer
+- [Download TransferHub Setup v1.0.0](https://github.com/Pratham216/File-Transfer-App/releases/download/v1.0.0/TransferHub%20Setup%201.0.0.exe)
+
+### All Releases
+- [View all versions on GitHub Releases](https://github.com/Pratham216/File-Transfer-App/releases)
 
 ---
 ## ✨ **Features**
@@ -136,6 +146,19 @@ The app will be available at `http://localhost:5173`
 ### **Build for Production**
 ```bash
 cd frontend
+npm run build
+```
+
+### **Run Desktop App (Electron)**
+```bash
+# from project root
+npm install
+npm run dev
+```
+
+### **Build Windows Installer (Electron)**
+```bash
+# from project root
 npm run build
 ```
 

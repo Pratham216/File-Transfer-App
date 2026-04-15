@@ -14,8 +14,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Ensure upload directory exists (Critical for Render/Cloud)
-const uploadsDir = path.join(__dirname, "uploads");
+// Allow desktop app to override upload directory to a writable user-data path.
+const uploadsDir = process.env.UPLOAD_DIR || path.join(__dirname, "uploads");
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
@@ -36,15 +36,28 @@ const FILE_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
 // Set local IP dynamically
 const networkInterfaces = os.networkInterfaces();
 let localIp = "localhost";
-for (const interfaceName in networkInterfaces) {
-  const interfaces = networkInterfaces[interfaceName];
-  for (const iface of interfaces) {
-    if (iface.family === "IPv4" && !iface.internal) {
-      localIp = iface.address;
-      break;
+
+const getPreferredIp = () => {
+  let fallbackIp = "localhost";
+  for (const interfaceName in networkInterfaces) {
+    const interfaces = networkInterfaces[interfaceName];
+    for (const iface of interfaces) {
+      if ((iface.family === "IPv4" || iface.family === 4) && !iface.internal) {
+        if (
+          iface.address.startsWith("192.168.") ||
+          iface.address.startsWith("10.") ||
+          iface.address.startsWith("172.")
+        ) {
+          return iface.address;
+        }
+        fallbackIp = iface.address;
+      }
     }
   }
-}
+  return fallbackIp;
+};
+
+localIp = getPreferredIp();
 
 const PORT = process.env.PORT || 5000;
 const BASE_URL = `http://${localIp}:${PORT}`;
@@ -126,7 +139,7 @@ app.post("/upload", upload.array("files", 10), async (req, res) => {
 
     // Multiple files, create a ZIP
     const zipName = `files-${Date.now()}.zip`;
-    const zipPath = path.join(__dirname, "uploads", zipName);
+    const zipPath = path.join(uploadsDir, zipName);
     const output = fs.createWriteStream(zipPath);
     const archive = archiver("zip", { zlib: { level: 9 } });
 
@@ -156,8 +169,15 @@ app.post("/upload", upload.array("files", 10), async (req, res) => {
 });
 
 // Serve uploaded files or zip
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/uploads", express.static(uploadsDir));
 app.get("/health", (req, res) => res.json({ status: "ok" }));
+app.get("/config", (req, res) => {
+  res.json({
+    localIp,
+    baseUrl: BASE_URL,
+    port: PORT
+  });
+});
 
 const HOST = '0.0.0.0'; // Listen on all network interfaces
 const server = app.listen(PORT, HOST, () => {

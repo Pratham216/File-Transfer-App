@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useDropzone } from "react-dropzone";
 import { QRCodeCanvas } from "qrcode.react";
@@ -13,14 +13,26 @@ const FileUpload = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
+  const [serverConfig, setServerConfig] = useState(null);
 
   const handleFileChange = (acceptedFiles) => {
     setFiles(acceptedFiles);
   };
 
-  const apiBaseUrl =
-    (import.meta.env.PROD && import.meta.env.VITE_API_BASE_URL) ||
-    `http://${window.location.hostname}:5000`;
+  const isDesktopApp =
+    window.location.protocol === "file:" ||
+    navigator.userAgent.toLowerCase().includes("electron");
+  const apiBaseUrl = isDesktopApp
+    ? "http://localhost:5000"
+    : (import.meta.env.PROD && import.meta.env.VITE_API_BASE_URL) ||
+      `http://${window.location.hostname}:5000`;
+
+  useEffect(() => {
+    fetch(`${apiBaseUrl}/config`)
+      .then((res) => res.json())
+      .then((data) => setServerConfig(data))
+      .catch((err) => console.error("Failed to fetch server config:", err));
+  }, [apiBaseUrl]);
 
   const handleUpload = () => {
     if (files.length === 0) return alert("Please select files!");
@@ -114,6 +126,20 @@ const FileUpload = () => {
         >
           Upload your files and share them with anyone, anywhere
         </motion.p>
+        
+        {serverConfig && (
+          <motion.div 
+            className="server-status"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.4 }}
+          >
+            <span className="status-dot"></span>
+            <span className="status-text">
+              Network IP: <strong>{serverConfig.localIp}</strong>
+            </span>
+          </motion.div>
+        )}
       </div>
 
       <motion.div
