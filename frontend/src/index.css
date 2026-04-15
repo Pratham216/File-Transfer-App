@@ -1,3 +1,16 @@
+:root {
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #141414;
+  --accent-primary: #38bdf8;
+  --accent-secondary: #94a3b8;
+  --accent-purple: #c084fc;
+  --text-primary: #ffffff;
+  --text-secondary: #a3a3a3;
+  --border-color: rgba(255, 255, 255, 0.05);
+  --glass-bg: rgba(18, 18, 18, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.06);
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -6,7 +19,7 @@
 
 html {
   scroll-behavior: smooth;
-  background: #0a0618;
+  background: var(--bg-primary);
 }
 
 body {
@@ -15,13 +28,13 @@ body {
   font-family: 'Inter', 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #0a0618;
-  color: #ffffff;
+  background: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 #root {
   min-height: 100vh;
-  background: #0a0618;
+  background: var(--bg-primary);
 }
 
 /* Hide default file input */

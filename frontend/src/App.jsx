@@ -18,49 +18,40 @@ function App() {
         exit={{ opacity: 0 }}
         transition={{ duration: 1.5, ease: "easeInOut" }}
       >
-        {/* Animated Background */}
+        {/* Animated Background Layers */}
         <div className="animated-bg">
           <motion.div 
-            className="gradient-overlay"
-            animate={{
-              background: [
-                "linear-gradient(135deg, #100a23 0%, #1e1b4b 50%, #0f172a 100%)",
-                "linear-gradient(135deg, #1e1b4b 0%, #0f172a 50%, #100a23 100%)",
-                "linear-gradient(135deg, #0f172a 0%, #100a23 50%, #1e1b4b 100%)",
-                "linear-gradient(135deg, #100a23 0%, #1e1b4b 50%, #0f172a 100%)"
-              ],
-              scale: [1, 1.01, 1]
-            }}
-            transition={{
-              duration: 20,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
+            className="gradient-overlay layer-1"
+            animate={{ opacity: [1, 0.5, 1] }}
+            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+          />
+          <motion.div 
+            className="gradient-overlay layer-2"
+            animate={{ opacity: [0, 0.5, 0] }}
+            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
           />
         </div>
 
-        {/* Floating Particles */}
+        {/* Floating Particles - Reduced Count */}
         <div className="particles">
-          {[...Array(30)].map((_, i) => (
+          {[...Array(18)].map((_, i) => (
             <motion.div
               key={i}
               className="particle"
               style={{
-                left: `${(i * 3.33) % 100}%`,
-                top: `${(i * 5) % 100}%`,
+                left: `${(i * 5.5) % 100}%`,
+                top: `${(i * 7) % 100}%`,
               }}
               animate={{
-                y: [0, -100, 0],
-                x: [0, Math.sin(i) * 50, 0],
-                opacity: [0.1, 0.6, 0.1],
-                scale: [1, 1.5, 1],
-                rotate: [0, 180, 360]
+                y: [0, -60, 0],
+                x: [0, Math.sin(i) * 30, 0],
+                opacity: [0.1, 0.4, 0.1],
               }}
               transition={{
-                duration: 6 + i * 0.3,
+                duration: 8 + i * 0.5,
                 repeat: Infinity,
-                delay: i * 0.2,
-                ease: "easeInOut"
+                delay: i * 0.1,
+                ease: "linear"
               }}
             />
           ))}

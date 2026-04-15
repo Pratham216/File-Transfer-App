@@ -53,10 +53,9 @@ const Footer = () => {
             <div className="footer-column">
               <h4 className="footer-heading">Connect</h4>
               <ul className="footer-list">
-                <li><a href="#">GitHub</a></li>
-                <li><a href="#">Twitter</a></li>
-                <li><a href="#">Discord</a></li>
-                <li><a href="#">Email</a></li>
+                <li><a href="https://github.com/Pratham216" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+                <li><a href="https://www.linkedin.com/in/pratham282/" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
+                <li><a href="mailto:prathambisht282@gmail.com">Email</a></li>
               </ul>
             </div>
           </div>
